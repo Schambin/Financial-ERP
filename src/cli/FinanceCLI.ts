@@ -29,7 +29,8 @@ export class FinanceCLI {
         console.log('2. List Accounts');
         console.log('3. Mark Account as Paid');
         console.log('4. Resume');
-        console.log('5. Exit\n');
+        console.log('5. Search by ID');
+        console.log('6. Exit\n');
 
         this.rl.question('Choose an option: ', (answer) => {
             switch (answer.trim()) {
@@ -46,6 +47,9 @@ export class FinanceCLI {
                     this.showSummary();
                     break;
                 case '5':
+                    this.searchAccountById();
+                    break;
+                case '6':
                     this.exit();
                     break;
                 default:
@@ -58,7 +62,7 @@ export class FinanceCLI {
 
     private async addAccountMenu() {
         console.clear();
-        console.log('=== Add new account ===\n');
+        console.log('=== Add New Account ===\n');
 
         const description = await CLIUtils.validateInput(this.rl,
             'Description: ', input => input.trim()
@@ -66,18 +70,47 @@ export class FinanceCLI {
                 : 'Decription can not be empty!'
         );
 
-        const value = parseFloat(await CLIUtils.validateInput(this.rl,
-            'Value: ', input => !isNaN(parseFloat(input)) && parseFloat(input) > 0
-                ? true
-                : 'Type a positive value!'
-        ));
+        const valueStr = await CLIUtils.validateInput(
+            this.rl,
+            'Value: ',
+            input => {
+                const cleanedInput = input.trim().replace(/^\+|,/g, '');
+
+                const value = parseFloat(cleanedInput);
+                if (isNaN(value) || value <= 0) {
+                    return 'Invalid Format! Number must be positive (ex: 150.50 ou 100)';
+                }
+
+                if (!/^\d*\.?\d+$/.test(cleanedInput)) {
+                    return 'Invalid Format! Number must be positive (ex: 250 ou 199.9999)';
+                }
+
+                return true;
+            }
+        );
+
+        const value = parseFloat(valueStr.replace(/^\+|,/g, ''));
 
         const dueDateStr = await CLIUtils.validateInput(this.rl,
-            'Due Date(YYY-MM-DD): ',
-            input => /^\d{4}-\d{2}-\d{2}$/.test(input)
-                ? true
-                : 'Formato inválido! Use YYYY-MM-DD'
+            'Due Date(YYYY-MM-DD): ',
+            input => {
+                if (!DateUtils.isValidDate(input)) {
+                    return ('Invalid Date! Use YYYY-MM-DD with real values (ex: 2024-12-31)');
+                }
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const inputDate = new Date(input);
+
+                if (inputDate < today) {
+                    return 'Date is in the past! Use a current date.';
+                }
+
+                return true
+            }
         );
+
+        const dueDate = DateUtils.parseDate(dueDateStr);
 
         const typeStr = await CLIUtils.validateInput(this.rl,
             'Type (1 - Pay, 2 - Receive): ',
@@ -87,9 +120,7 @@ export class FinanceCLI {
         );
 
         const type = typeStr === '1' ? AccountType.PAYABLE : AccountType.RECEIVABLE;
-        const dueDate = new Date(dueDateStr);
-
-        const account = this.accountService.addAcount({
+        const account = this.accountService.addAccount({
             description,
             value,
             dueDate,
@@ -115,10 +146,10 @@ export class FinanceCLI {
             accounts.forEach(account => {
                 console.log(
                     `[${account.type === AccountType.PAYABLE ? 'PAY' : 'RECEIVE'}] ${account.description}: ` +
-                    `R$ ${account.value.toFixed(2)}` +
-                    `Maturity Date: ${DateUtils.formatDate(account.dueDate)}` +
-                    `Status: ${account.isPaid ? 'PAID' : 'PENDANT'}` +
-                    ` (ID: ${account.id})`//add more as needed, add on interfce too
+                    `R$ ${account.value.toFixed(2)} | ` +
+                    `Due Date: ${DateUtils.formatDate(account.dueDate)} | ` +
+                    `Status: ${account.isPaid ? 'PAID' : 'PENDANT'} | ` +
+                    `(ID: ${account.id}) | `//add more as needed, add on interfce too
                 );
             });
             console.log();
@@ -189,6 +220,37 @@ export class FinanceCLI {
         this.rl.question('Press ENTER to Continue...', () => {
             this.showMainMenu();
         });
+    }
+
+    private async searchAccountById() {
+        console.clear();
+        console.log('=== Search by ID ===\n');
+
+        const id = await CLIUtils.validateInput(
+            this.rl,
+            'Digite o ID da conta: ',
+            input => {
+                const isValid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.trim());
+                return isValid || 'Invalid ID! Must be an UUID (ex: 550e8400-e29b-41d4-a716-446655440000)';
+            }
+        );
+
+        const account = this.accountService.getAccountById(id);
+
+        if (account) {
+            console.log('\n=== Account Found ===');
+            console.log(`ID: ${account.id}`);
+            console.log(`Description: ${account.description}`);
+            console.log(`Value: R$ ${account.value.toFixed(2)}`);
+            console.log(`Due Date: ${DateUtils.formatDate(account.dueDate)}`);
+            console.log(`Type: ${account.type === AccountType.PAYABLE ? 'Paid' : 'Receive'}`);
+            console.log(`Status: ${account.isPaid ? 'Paid' : 'Pendant'}`);
+        } else {
+            console.log('\nAccount not found!');
+        }
+
+        await CLIUtils.question(this.rl, '\nPress ENTER to continue...');
+        this.showMainMenu();
     }
 
     private exit() {
