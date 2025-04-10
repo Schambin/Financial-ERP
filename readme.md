@@ -1,16 +1,36 @@
-# Seu objetivo é desenvolver uma aplicação que permita aos usuários lançar contas e listar informações sobre contas a pagar e contas a receber. A aplicação deve ter recursos para *visualizar o total de contas a pagar*, contas a receber e o total geral de contas. Veja os requisitos abaixo:
+# 📊 Sistema de Contas Financeiras CLI
 
-## Lançamento de contas
-[X] - Os usuários devem poder adicionar contas a pagar e contas a receber, informando o valor, descrição e data de vencimento.
+## 📌 Visão Geral
+Sistema para controle de contas a pagar/receber com interface CLI nativa, desenvolvido com TypeScript seguindo princípios de Clean Code.
 
-## Listagem de contas
-[X] - A aplicação deve exibir uma lista de todas as contas registradas, incluindo informações como valor, descrição, data de vencimento e status (pago ou pendente).
+### Pré-requisitos
+- Node.js v18+
+- npm v9+
 
-## Total de contas a pagar
-[X] - Os usuários devem poder visualizar o total de todas as contas a pagar registradas na aplicação.
+### Instalação
+```bash
+    git clone https://github.com/Schambin/Financial-ERP
+    cd toPayToReceive
+    npm install 
+```
 
-## Total de contas a receber 
-[X] - Os usuários devem poder visualizar o total de todas as contas a receber registradas na aplicação.
-
-## Total geral de contas 
-[X] - A aplicação deve calcular e exibir o total geral de contas, considerando contas a pagar e contas a receber.
+```
+toPayToReceive
+├─ package-lock.json
+├─ package.json
+├─ readme.md
+├─ requirements.md
+├─ src
+│  ├─ cli
+│  │  └─ FinanceCLI.ts
+│  ├─ index.ts
+│  ├─ models
+│  │  ├─ Account.ts
+│  │  └─ AccountType.ts
+│  ├─ services
+│  │  ├─ AccountService.ts
+│  │  └─ SummaryService.ts
+│  └─ utils
+│     └─ DateUtils.ts
+└─ tsconfig.json
+```
