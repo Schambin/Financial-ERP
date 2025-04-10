@@ -2,6 +2,7 @@ import { AccountService } from "../services/AccountService";
 import { SummaryService } from "../services/SummaryService";
 import { AccountType } from '../models/AccountType';
 import { DateUtils } from "../utils/DateUtils";
+import { CLIUtils } from "../utils/cliUtils";
 import readline from "readline";
 
 export class FinanceCLI {
@@ -55,51 +56,51 @@ export class FinanceCLI {
         });
     }
 
-    private addAccountMenu() {
-        //0 can be added idk why
+    private async addAccountMenu() {
         console.clear();
-        console.log('=== Create new account ===\n');
+        console.log('=== Add new account ===\n');
 
-        this.rl.question('Description: ', (description) => {
-            this.rl.question('Value: ', (valueStr) => {
-                const value = parseFloat(valueStr);
-                if (isNaN(value) || value < 0) {
-                    console.log('\nInvalid Value! Value must be positive.\n');
-                    setTimeout(() => this.addAccountMenu(), 1000);
-                    return;
-                }
+        const description = await CLIUtils.validateInput(this.rl,
+            'Description: ', input => input.trim()
+                ? true
+                : 'Decription can not be empty!'
+        );
 
-                this.rl.question('Due Date (YYYY-MM--DD): ', (dueDateStr) => {
-                    if (!/^\d{4}-\d{2}-\d{2}$/.test(dueDateStr)) {
-                        console.log('\nInvalid date format! Use Year-Month-Day.\n');
-                        setTimeout(() => this.addAccountMenu(), 1000);
-                        return;
-                    }
+        const value = parseFloat(await CLIUtils.validateInput(this.rl,
+            'Value: ', input => !isNaN(parseFloat(input)) && parseFloat(input) > 0
+                ? true
+                : 'Type a positive value!'
+        ));
 
-                    this.rl.question('Type 1 - Pay, 2 - Receive: ', (typeStr) => {
-                        //fix - if the number is diferent from 1 or 2 the account register as receivable
-                        const type = typeStr.trim() === '1' ?
-                            AccountType.PAYABLE :
-                            AccountType.RECEIVABLE;
+        const dueDateStr = await CLIUtils.validateInput(this.rl,
+            'Due Date(YYY-MM-DD): ',
+            input => /^\d{4}-\d{2}-\d{2}$/.test(input)
+                ? true
+                : 'Formato inválido! Use YYYY-MM-DD'
+        );
 
-                        const dueDate = new Date(dueDateStr);
+        const typeStr = await CLIUtils.validateInput(this.rl,
+            'Type (1 - Pay, 2 - Receive): ',
+            input => ['1', '2'].includes(input.trim())
+                ? true
+                : 'Type 1 to Pay or 2 to Receive!'
+        );
 
-                        const account = this.accountService.addAcount({
-                            description,
-                            value,
-                            dueDate,
-                            type
-                        });
+        const type = typeStr === '1' ? AccountType.PAYABLE : AccountType.RECEIVABLE;
+        const dueDate = new Date(dueDateStr);
 
-                        console.log('\nAccount added successfully!');
-                        console.log(`ID: ${account.id}\n`);
-                        this.rl.question('Press ENTER to continue...', () => {
-                            this.showMainMenu();
-                        });
-                    });
-                });
-            });
+        const account = this.accountService.addAcount({
+            description,
+            value,
+            dueDate,
+            type
         });
+
+        console.log('\nAccount Added Successfully');
+        console.log(`ID: ${account.id}\n`);
+
+        await CLIUtils.question(this.rl, 'Press ENTER to Continue...');
+        this.showMainMenu();
     }
 
     private listAccounts() {
