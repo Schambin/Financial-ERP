@@ -59,7 +59,7 @@ export class FinanceCLI {
         //0 can be added idk why
         console.clear();
         console.log('=== Create new account ===\n');
-        
+
         this.rl.question('Description: ', (description) => {
             this.rl.question('Value: ', (valueStr) => {
                 const value = parseFloat(valueStr);
@@ -77,6 +77,7 @@ export class FinanceCLI {
                     }
 
                     this.rl.question('Type 1 - Pay, 2 - Receive: ', (typeStr) => {
+                        //fix - if the number is diferent from 1 or 2 the account register as receivable
                         const type = typeStr.trim() === '1' ?
                             AccountType.PAYABLE :
                             AccountType.RECEIVABLE;
