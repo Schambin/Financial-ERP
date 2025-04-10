@@ -15,3 +15,11 @@ export interface AccountInput {
     dueDate: Date;
     type: AccountType;
 }
+
+export interface AccountMock {
+    description: string;
+    value: number;
+    dueDate: Date;
+    type: AccountType;
+    isPaid: boolean;
+}
