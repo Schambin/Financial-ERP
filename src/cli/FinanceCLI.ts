@@ -205,7 +205,7 @@ export class FinanceCLI {
     private showSummary() {
         console.clear();
         console.log('=== Financial Resume ===\n');
-        console.log(`- Due Amount: $ ${this.summaryService.getTotalPayable().toFixed(2)}`);
+        console.log(`- Payable: $ ${this.summaryService.getTotalPayable().toFixed(2)}`);
         console.log(`- Receivable: $ ${this.summaryService.getTotalReceivable().toFixed(2)}`);
         console.log(`- Net Balance: $ ${this.summaryService.getNetBalance().toFixed()}\n`);
 
