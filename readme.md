@@ -19,7 +19,7 @@ Sistema para controle de contas a pagar/receber com interface CLI nativa, desenv
 
 ## 🛠️ Uso
 
-```javascript
+```
     npm run dev  #Modo de Desenvolvimento
     npm start    #Modo Prod
 ```
@@ -86,10 +86,10 @@ Sistema para controle de contas a pagar/receber com interface CLI nativa, desenv
 
 - **Características dos Dados:**
 
-    - IDs válidos no formato UUID v4
-    - Datas no padrão ISO (YYYY-MM-DD)
-    - Status refletindo situações reais (PENDING/PAID)
-    - Valores com precisão decimal
+  - IDs válidos no formato UUID v4
+  - Datas no padrão ISO (YYYY-MM-DD)
+  - Status refletindo situações reais (PENDING/PAID)
+  - Valores com precisão decimal
 
 ## Estrutura do Projeto
 
