@@ -4,20 +4,22 @@
 
 Sistema para controle de contas a pagar/receber com interface CLI nativa, desenvolvido com TypeScript seguindo princípios de Clean Code.
 
-### Pré-requisitos
-
-- Node.js v18+
-- npm v9+
+### Foi Utilizado 
+- npm 10.8.2
+- Node 18.20.5
+- Typescript 5.8.3
 
 ## 🚀 Começando
 
 ### Pré-requisitos
 
 - Node.js v18+
-- npm v9+
+- npm v10+
 
 ### Instalação
-
+1. Clone o repositorio
+2. Vá até a pasta mãe
+3. Execute npm install
 ```bash
     git clone https://github.com/Schambin/Financial-ERP
     cd toPayToReceive
